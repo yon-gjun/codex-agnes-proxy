@@ -101,7 +101,9 @@ codex-agnes-proxy on http://127.0.0.1:15721/v1/responses
 
 ### 4️⃣ 配置 Codex CLI
 
-编辑 `~/.codex/config.toml`，把模型指向代理：
+将 Codex CLI 的 API Base URL 指向本地代理（127.0.0.1:15721）。
+
+如果使用 `~/.codex/config.toml` 直接配置，参考以下内容：
 
 ```toml
 [models.proxied]
@@ -109,13 +111,6 @@ provider = "switch"
 wire_protocol = "responses"
 requires_openai_auth = false
 # instructions = "You are a coding assistant."  # 可选
-```
-
-如果用的是 `cc switch` 工具：
-
-```bash
-cc switch codex proxy set LOCAL http://127.0.0.1:15721
-cc switch codex proxy use LOCAL
 ```
 
 ### 5️⃣ 验证

@@ -15,32 +15,27 @@
 ## 架构
 
 ```
-┌────────────────────────────────────────────────────────────────┐
-│                     macOS / Windows / Linux                     │
-│                                                                 │
-│  +──────────────+     HTTP POST      +────────────────────+     │
-│  │              │   /v1/responses    │                    │     │
-│  │  Codex CLI   │ ──────────────────→│  Codex Agnes Proxy │     │
-│  │              │                    │  (localhost:15721)  │     │
-│  │  cc switch   │←──────────────────│                    │     │
-│  │  proxy       │   SSE Events      │                    │     │
-│  +──────┬───────+                    +─────────┬──────────+     │
-│         │                                        │              │
-│         │                                HTTPS POST             │
-│         │                              /v1/chat/completions     │
-│         │                                        │              │
-│         │                              +─────────▼──────────+   │
-│         │                              │                    │   │
-│         │                              │   Agnes AI API     │   │
-│         │                              │  (Agnes-2.0-Flash) │   │
-│         │                              │                    │   │
-│         │                              +────────────────────+   │
-│         │                                                       │
-│         │  +──────────────+                                     │
-│         └──│  cc switch   │  ← 将 Codex 的请求重定向到本地      │
-│            │  (config)    │     127.0.0.1:15721                 │
-│            +──────────────+                                     │
-└────────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                   macOS / Windows / Linux                    │
+│                                                              │
+│  +──────────────┐   HTTP POST      +────────────────────+   │
+│  │              │  /v1/responses   │                    │   │
+│  │  Codex CLI   │ ────────────────→│  Codex Agnes Proxy │   │
+│  │              │                  │  (localhost:15721) │   │
+│  │              │←────────────────│                    │   │
+│  │              │   SSE Events    │                    │   │
+│  +──────┬───────+                  +─────────┬──────────+   │
+│         │                                      │            │
+│         │                              HTTPS POST           │
+│         │                            /v1/chat/completions   │
+│         │                                      │            │
+│         │                            +─────────▼──────────+ │
+│         │                            │                    │ │
+│         │                            │   Agnes AI API     │ │
+│         │                            │ (Agnes-2.0-Flash)  │ │
+│         │                            │                    │ │
+│         │                            +────────────────────+ │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ## 快速开始
@@ -48,7 +43,7 @@
 ### 前提条件
 
 - **Node.js** v18+（推荐 v20/v22/v24）
-- **OpenAI Codex CLI** 已安装并配置好 `cc switch`
+- **OpenAI Codex CLI** 已安装
 
 ### 1. 获取 Agnes API Key
 
@@ -103,22 +98,16 @@ codex-agnes-proxy on http://127.0.0.1:15721/v1/responses
 
 ### 4. 配置 Codex CLI
 
-编辑 `~/.codex/config.toml`，确保以下内容：
+将 Codex CLI 的 API Base URL 指向本地代理（127.0.0.1:15721），具体方式取决于你的 Codex 配置工具。
+
+如果使用 `config.toml` 直接配置，参考以下内容（字段名可能因 Codex 版本而异）：
 
 ```toml
 [models.proxied]
 provider = "switch"
 wire_protocol = "responses"
-instructions = "You are a helpful AI coding assistant."  # 可自定义
+instructions = "You are a helpful AI coding assistant."
 requires_openai_auth = false
-```
-
-并将 cc switch 的 API Base 指向本地代理：
-
-```bash
-# 用 cc switch 的 proxy 子命令或配置文件设置
-cc switch codex proxy set LOCAL http://127.0.0.1:15721
-cc switch codex proxy use LOCAL
 ```
 
 ### 5. 验证
@@ -159,7 +148,7 @@ codex exec      # 开始编码
 
 - 不支持图片/多模态输入（Agnes-2.0-Flash 接口限制）
 - 不支持实时流式逐 token 输出（非技术限制，可改进）
-- Codex 仅支持 `cc switch` 的 `responses` wire protocol（v0.138+）
+- Codex v0.138+ 仅支持 `responses` wire protocol
 
 ## 许可证
 
